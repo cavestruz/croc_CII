@@ -1,0 +1,178 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
+
+#ifdef RADIATIVE_TRANSFER
+#include "analysis_dke.h"
+#else
+#include "analysis_dke_noRT.h"
+#endif // RADIATIVE_TRANSFER
+
+char *ngOutputDir = NULL;
+
+const char *ngOutputFile(const char *filepath)
+{
+  int ret;
+  static char str[999];
+  char *name;
+
+  if(ngOutputDir == NULL)
+    {
+      strcpy(str,filepath);
+    }
+  else
+    {
+      strcpy(str,ngOutputDir);
+      strcat(str,"/");
+      strcat(str,filepath);
+    }
+
+  name = strrchr(str,'/');
+  if(name != NULL)
+    {
+      *name = 0;
+      /*
+      //  Create output directory
+      */
+      ret = system_mkdir(str);
+      if(ret != 0)
+	{
+	  cart_error("system_mkdir(\"%s\") returned with the error code %d. Abort.",str,ret);
+	  return NULL;
+	}
+      *name = '/';
+    }
+
+  return str;
+}
+
+
+int main_analysis(int argc, char **argv)
+{
+  printf("Begun the main analysis has!\n");
+
+  int ret;
+  char str[999];
+
+  //ngLoadHalos(NULL);
+
+  sprintf(str,"a%6.4f",auni[min_level]);
+
+  ret = system_mkdir(str);
+  if(ret != 0)
+    {
+      cart_error("system_mkdir(\"%s\") returned with the error code %d. Abort.",str,ret);
+      return -1;
+    }
+  ngOutputDir = str;
+
+#ifdef RADIATIVE_TRANSFER
+  DEboxAnalysis(); // 1
+  DEBoxDistributionAnalysis(); //2
+  //DELOS_alongprojgrid();
+  //DELOS_alongprojgrid_generic();
+  //DELOS_alongprojgrid_multi_d_comparison();
+  //DELOS_alongprojgrid_multi_d_LOS_characteristic_length();
+  //DELOS_cross_section_vs_Mvir_file_approach(); //3
+
+  /***************************************************/
+  /*                  CII Block                      */
+  /***************************************************/
+  
+  //CII_net_heating_cooling_etc_per_primary_galaxy(); //4
+
+  //CII_emission_individual_galaxy_map(); //5
+  //CII_3d_radial_profiles_Art_Format();
+  //CII_projected_3d_radial_profiles_Art_Format();
+
+  //CII_phase_diagrams_each_galaxy();
+  //CII_phase_diagrams_each_galaxy_Photoionization_vs_GPE(); //6
+  //CII_individual_primary_halo_properties();
+
+  //CII_projected_radiation_map();
+  //CII_sliced_radiation_map(); //7
+
+  //CII_background_spectrum();
+  //CII_radial_radiation_spectrum();
+  //CII_radial_radiation_spectrum_HI_cut();
+  //CII_radial_radiation_spectrum_HI_weighted(); //8
+  //CII_radial_radiation_spectrum_T_cut();
+  //CII_radial_radiation_spectrum_height_cut();
+  //CII_radial_radiation_spectrum_scatter_plot();
+  //CII_radiation_field_check();
+
+  /***************************************************/
+  /*                  BQC Block                      */
+  /***************************************************/
+
+  //BQC_covering_fraction_versus_radius_fast_version();
+  //BQC_covering_fraction_versus_radius_fast_version_random_subset();
+  //BQC_box_covering_fraction_by_halo();
+
+  //BQC_star_formation_catalog();
+
+  /***************************************************/
+  /*                   CO Block                      */
+  /* This block requires the CO flag to be turned on */
+  /***************************************************/
+
+  //CO_emission_trial();
+  //CII_net_heating_cooling_etc_per_primary_galaxy_wCO();
+  //CII_phase_diagrams_each_galaxy_Photoionization_vs_GPE_wCO();
+  //CII_emission_individual_galaxy_map_wCO();
+  //CII_map_with_galaxy_face_on();
+  //CII_map_with_galaxy_face_on_velocity_profiles();
+
+  
+  //LOS_test();
+
+  /***************************************************/
+  /*                  LLS Block                      */
+  /***************************************************/
+
+  //LLS_3d_distance_to_closest_primary_halo();
+  //LLS_3d_distance_to_closest_halo();
+  //LLS_3d_distance_to_closest_halo_r_trunk();
+  //LLS_Characteristic_Length();
+  //LLS_cross_section_vs_Mvir_maxima_approach();
+  //LLS_cross_section_vs_Mvir_maxima_approach_rtrunk();
+  //LLS_phase_diagrams_central_cell();
+  //LLS_NHI_histogram_for_different_lengths();
+  //LLS_Photoionization_versus_Recominbation();
+
+  /**************************************************/
+  /*                Metal Absorption                */
+  /**************************************************/
+
+  //MgII_face_on_profile_within_km_s();
+  //DEVEL_velocity_width();
+  //DEVEL_DLA_velocity_width();
+  //DEVEL_DLA_velocity_width_vs_halo_mass_vs_metallicity();
+  //HI_map_with_galaxy_face_on_velocity_cube();
+  //HI_map_with_galaxy_perp_velocity_cube();
+  //Circular_Velocity_By_Component();
+
+  /**************************************************/
+  /*       Halo and Stream Fragmentation            */
+  /**************************************************/
+
+  //HSF_individual_galaxy_map();
+  //HSF_map_in_stream_plane();
+  //HSF_stream_cross_section();
+
+#else //RADIATIVE_TRANSFER
+
+  /********************************************************************************************************/
+  /*                                          No RT Block                                                 */
+  /********************************************************************************************************/
+  
+  //DEboxAnalysis_noRT();
+  //DEBoxDistributionAnalysis_noRT();
+  //DEVEL_velocity_width_noRT();
+  //BQC_box_covering_fraction_by_halo_noRT();
+  
+
+#endif //RADIATIVE_TRANSFER
+  return 0;
+}
