@@ -519,7 +519,18 @@ void CII_map_with_galaxy_face_on_velocity_profiles()
 		      }
 
 		    PDR_C2cooling = 0.;
-		    
+		    // For things which are not resolved, make
+		    // assumptions about PDR (photodissociation
+		    // region, outer HII region - not yet ionized, but
+		    // molecules are already dissociating) in star
+		    // forming regions (Carbon II).  This is a subgrid
+		    // model treatment for less resolved physical
+		    // pieces.  Comparison of different pieces will be
+		    // a part of the storyline (which dominates, etc.)
+
+		    //  Atomic number density criterion - likely based
+		    //  on some sort of fitting formula, but need
+		    //  literature source for this.
 		    if((cell_HI_density(losDataStorage[i].cell)+2.0*cell_H2_density(losDataStorage[i].cell))*units->number_density*units->length/pow(2.0,cell_level(losDataStorage[i].cell))*met_cell > 1.0e21)
 		      PDR_C2cooling=1.0e-5/(4.0*M_PI)*1.0e21*grain_eff*frac_abs*8.0e27*sfr_in_cell/pow(units->length/pow(2.0,cell_level(losDataStorage[i].cell)),3.0);
 		    
@@ -528,15 +539,26 @@ void CII_map_with_galaxy_face_on_velocity_profiles()
 		    losgasdensity+=cell_gas_density(losDataStorage[i].cell)*(min2(losDataStorage[i].r2,len)-losDataStorage[i].r1);
 		    losmetdensity+=met_cell*constants->Zsun*cell_gas_density(losDataStorage[i].cell)*(min2(losDataStorage[i].r2,len)-losDataStorage[i].r1);
 
-
+		    // To get spectrum
 		    projected_momentum = cell_momentum(losDataStorage[i].cell,0)*v3[0]+cell_momentum(losDataStorage[i].cell,1)*v3[1]+cell_momentum(losDataStorage[i].cell,2)*v3[2];
 
 
 		    projected_halo_velocity = (double)ngHalos->list[counter].vel[0]*v3[0]+(double)ngHalos->list[counter].vel[1]*v3[1]+(double)ngHalos->list[counter].vel[2]*v3[2];
+		    // Add hubble component to get the proper velocity
 		    velocity = -Hubble(abox[min_level])*(losDataStorage[i].r2+losDataStorage[i].r1)/2.0*units->length/constants->Mpc + projected_momentum/cell_gas_density(losDataStorage[i].cell)*units->velocity*1e-5-projected_halo_velocity;
 		    
 		    
-
+		    // If within range, add to the optical depth - two
+		    // different optical depths.  First is only
+		    // cooling (atomic gas contributions), second is
+		    // all other contributions.  CII - when gas cools,
+		    // CII is one of the lines from cooling radiation,
+		    // then there is molecular radiation, then also
+		    // PDR.  Need to calculate separate cooling
+		    // contributions to do a budget of contributions
+		    // to CII.  --> Create CII emission in each cell.
+		    // YT should be able to do an emission spectrum.  
+		    
 		    if(velocity > min_velocity && velocity < max_velocity)
 		      {
 			optical_depth[(int)((velocity-min_velocity)/(max_velocity-min_velocity)*(double)VEL_RES)]+=(C2_e_cooling+C2_a_cooling)*(min2(losDataStorage[i].r2,len)-losDataStorage[i].r1)*units->length*pow(constants->pc,2.0);
