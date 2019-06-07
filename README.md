@@ -11,3 +11,4 @@ Size is ~30G  Example loading of data (for I/O) in python here in *ARTIO* sectio
 
 (2)  Create a jupyter notebook for initial analysis.  Start with making temperature and density plots in yt.  Example yt script here: https://yt-project.org/doc/visualizing/plots.html
 
+(3)  Use yt to access "line-of-sight" information.
