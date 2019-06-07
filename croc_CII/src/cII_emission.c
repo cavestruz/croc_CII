@@ -242,7 +242,8 @@ stants->yr)*(min2(losDataStorage[i].r2,len)-losDataStorage[i].r1))*(min2(losData
                       }
 
                     PDR_C2cooling = 0.;
-                    // For things which are not resolved, make                                   // assumptions about PDR (photodissociation                                                                                               
+                    // For things which are not resolved, make                                   
+                    // assumptions about PDR (photodissociation                                                                                               
                     // region, outer HII region - not yet ionized, but                                                                                        
                     // molecules are already dissociating) in star                                                                                            
                     // forming regions (Carbon II).  This is a subgrid                                                                                        
