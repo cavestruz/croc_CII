@@ -45,14 +45,5 @@ sl = ds.r[:,:,0.]
 
 data = sl['log_dust_attenuation']
 
-def count_elements(seq) -> dict:
-     """Tally elements from `seq`."""
-     hist = {}
-     for i in seq:
-         hist[i] = hist.get(i, 0) + 1
-     return hist
-dictionary = count_elements(data)
-
-plt.bar(list(dictionary.keys()), dictionary.values(), color='g')
-
+plt.hist(data, bins=10000)
 plt.savefig('dust_hist.png')
