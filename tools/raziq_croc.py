@@ -13,9 +13,10 @@ def make_slice_plot(dataset,list_or_array):
         minimum = np.amin(all_data_at_z_0[p])
         maximum = np.amax(all_data_at_z_0[p])
         ratio = maximum/minimum
+#        print(p+"_"+str(ratio))
         if ratio < 100:
             slc = yt.SlicePlot(ds, 'z',p)
-            slc.set_log(p, True)
+            slc.set_log(p, False)
             slc.save(p + '_sliceplot.png')
         else: 
             slc = yt.SlicePlot(ds, 'z',p)
