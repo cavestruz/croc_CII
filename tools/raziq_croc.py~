@@ -17,9 +17,9 @@ def make_slice_plot(dataset,list_or_array):
         if ratio < 100:
             slc = yt.SlicePlot(ds, 'z',p)
             slc.set_log(p, False)
-            slc.save("../SlicePlots/"+ p + '_sliceplot.png')
+            slc.save(p + '_sliceplot.png')
         else: 
             slc = yt.SlicePlot(ds, 'z',p)
-            slc.save("../SlicePlots/"+ p + '_sliceplot.png')
+            slc.save(p + '_sliceplot.png')
 
 make_slice_plot(ds,plot_list)
