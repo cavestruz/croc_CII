@@ -1,5 +1,5 @@
 import yt as yt
-from yt.units import kilogram, centimeter, meter, Kelvin, gram
+from yt.units import kilogram, centimeter, meter, Kelvin, gram, kboltz
 import numpy as np
 
 #CODATA RECOMMENDED VALUES OF THE FUNDAMENTAL PHYSICAL CONSTANTS: 2014
@@ -13,7 +13,9 @@ L_soblen = 100. * parsec
 
 dust_cross_section = 2*10**(-21) * centimeter * centimeter
 
-C2_abun = 3.31*10**(-4)
+CII_abun = 3.31*10**(-4)
+
+z = ds.current_redshift
 
 ### All mass values come from the CRC Handbook of Chemistry and Physics May 2020
 
@@ -25,13 +27,9 @@ def _HII_number_density(field, data):
     return data["HII density"]/(1.007825032*amu-electron_mass)
 yt.add_field(("gas", "HII number density"), function=_HII_number_density, units="1/cm**3")
 
-#def _H2_density(field, data):
-#    return data["RT_HVAR_H2"]* gram/centimeter**3
-#yt.add_field(("gas", "H2 density"), function=_HI_number_density, units="g/cm**3")
-
-#def _H2_number_density(field, data):
-#    return data["H2 density"]/(2.016*amu)
-#yt.add_field(("gas", "H2 number density"), function=_H2_number_density, units="1/cm**3")
+def _H2_number_density(field, data):
+    return data["H2 density"]/(2.016*amu)
+yt.add_field(("gas", "H2 number density"), function=_H2_number_density, units="1/cm**3")
 
 def _HeI_number_density(field, data):
     return data["HeI density"]/(4.002602*amu)
@@ -46,31 +44,37 @@ def _HeIII_number_density(field, data):
 yt.add_field(("gas", "HeIII number density"), function=_HeIII_number_density, units="1/cm**3")
 
 def _log_dust_attenuation(field, data):
-#    return -(data["HI number density"]+2*data["H2 number density"])*data['metallicity']*L_soblen*dust_cross_section # With H2
-    return -(data["HI number density"])*data['metallicity']*L_soblen*dust_cross_section # Without H2
+    return -(data["HI number density"]+2*data["H2 number density"])*data['metallicity']*L_soblen*dust_cross_section # With H2
+#    return -(data["HI number density"])*data['metallicity']*L_soblen*dust_cross_section # Without H2
 yt.add_field(("gas", "log_dust_attenuation"), function=_log_dust_attenuation, units="")
 
-def _rC2e(field, data):
+def _rCIIe(field, data):
     return 6.67*10**(-20)*Kelvin**(0.5)*np.exp(-91.2*Kelvin/data['temperature'])/data["temperature"]**0.5
-yt.add_field(("gas", "rC2e"), function=_rC2e, units="")
+yt.add_field(("gas", "rCIIe"), function=_rCIIe, units="")
 
-def _rC2a(field, data):
+def _rCIIa(field, data):
     x = 16 + .344*(data['temperature']/Kelvin)**(0.5) - 47.7*Kelvin/data['temperature']
     x[x<0.0]=0
     return 10**(-24)*np.exp(-91.2*Kelvin/data['temperature'])*x
-yt.add_field(("gas", "rC2a"), function=_rC2e, units="")
+yt.add_field(("gas", "rCIIa"), function=_rCIIe, units="")
 
-def _C2_e_cooling(field, data):
-    return data['rC2e'] * (data['HII number density']+data['HeII number density']+2*data['HeIII number density']) * C2_abun * data['HI number density'] * data['metallicity']
-yt.add_field(("gas", "C2_e_cooling"), function=_C2_e_cooling, units="1/cm**6")
+def _CII_e_cooling(field, data):
+    return data['rCIIe'] * (data['HII number density']+data['HeII number density']+2*data['HeIII number density']) * CII_abun * data['HI number density'] * data['metallicity']
+yt.add_field(("gas", "CII_e_cooling"), function=_CII_e_cooling, units="1/cm**6")
 
-def _C2_a_cooling(field, data):
-    return data['rC2a'] * C2_abun * data['HI number density'] * data['HI number density'] * data['metallicity']
-yt.add_field(("gas", "C2_a_cooling"), function=_C2_a_cooling, units="1/cm**6")
+def _CII_a_cooling(field, data):
+    return data['rCIIa'] * CII_abun * data['HI number density'] * data['HI number density'] * data['metallicity']
+yt.add_field(("gas", "CII_a_cooling"), function=_CII_a_cooling, units="1/cm**6")
 
-def _C2_HeI_cooling(field, data):
-    return 0.38 * data['rC2a'] * data['HeI number density'] * C2_abun * data['HI number density'] * data['metallicity']
-yt.add_field(("gas", "C2_HeI_cooling"), function=_C2_HeI_cooling, units="1/cm**6")
+def _CII_HeI_cooling(field, data):
+    return 0.38 * data['rCIIa'] * data['HeI number density'] * CII_abun * data['HI number density'] * data['metallicity']
+yt.add_field(("gas", "CII_HeI_cooling"), function=_CII_HeI_cooling, units="1/cm**6")
+
+def _CII_CMB_emission(field, data):
+    return 2.0 *  CII_abun * data['HI number density'] * data['metallicity']*2.298*10**(-6)*kboltz*91.2*Kelvin*np.exp(-91.2*Kelvin/(2.725*Kelvin)*1/(1+z))
+yt.add_field(("gas", "CII_CMB_emission"), function=_CII_CMB_emission, units="erg/cm**3")
+
+
 
 
 #slc = yt.SlicePlot(ds, 'z','rC2a')
