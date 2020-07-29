@@ -76,7 +76,8 @@ def _CII_CMB_emission(field, data):
 yt.add_field(("gas", "CII_CMB_emission"), function=_CII_CMB_emission, units="erg/cm**3")
 
 def _CII_H2_para(field, data):
-    return (4.25*10**(-10)*erg*centimeter**3/second)*pow(data['temperature']/(100*Kelvin),0.124-0.018*np.log(data['temperature']/(100*Kelvin)))*kboltz*(91.2*Kelvin)*CII_abun*data['HI number density']*0.25*data['H2 number density']
+    rate_coefficient = 4.25*10**(-10)*erg*centimeter**3/second
+    return rate_coefficient*pow(data['temperature']/(100*Kelvin),0.124-0.018*np.log(data['temperature']/(100*Kelvin)))*kboltz*(91.2*Kelvin)*CII_abun*data['HI number density']*0.25*data['H2 number density']
 yt.add_field(("gas", "CII_H2_para"), function=_CII_H2_para, units="erg**2/(cm**3*second)") # Draine Table F6 pg 501
 
 def _CII_H2_ortho(field, data):
