@@ -1,5 +1,5 @@
 import yt as yt
-from yt.units import kilogram, centimeter, meter, Kelvin, gram, kboltz
+from yt.units import Kelvin, gram, kboltz, erg, centimeter
 import numpy as np
 
 #CODATA RECOMMENDED VALUES OF THE FUNDAMENTAL PHYSICAL CONSTANTS: 2014
@@ -15,9 +15,9 @@ dust_cross_section = 2*10**(-21) * centimeter * centimeter
 
 CII_abun = 3.31*10**(-4)
 
-z = ds.current_redshift
 
 ### All mass values come from the CRC Handbook of Chemistry and Physics May 2020
+
 
 def _HI_number_density(field, data):
     return data["HI density"]/(1.007825032*amu)
@@ -71,11 +71,17 @@ def _CII_HeI_cooling(field, data):
 yt.add_field(("gas", "CII_HeI_cooling"), function=_CII_HeI_cooling, units="1/cm**6")
 
 def _CII_CMB_emission(field, data):
+    z = data.ds.current_redshift
     return 2.0 *  CII_abun * data['HI number density'] * data['metallicity']*2.298*10**(-6)*kboltz*91.2*Kelvin*np.exp(-91.2*Kelvin/(2.725*Kelvin)*1/(1+z))
 yt.add_field(("gas", "CII_CMB_emission"), function=_CII_CMB_emission, units="erg/cm**3")
 
+def _CII_H2_para(field, data):
+    return (4.25*10**(-10)*erg*centimeter**3/second)*pow(data['temperature']/(100*Kelvin),0.124-0.018*np.log(data['temperature']/(100*Kelvin)))*kboltz*(91.2*Kelvin)*CII_abun*data['HI number density']*0.25*data['H2 number density']
+yt.add_field(("gas", "CII_H2_para"), function=_CII_H2_para, units="erg**2/(cm**3*second)") # Draine Table F6 pg 501
 
-
+def _CII_H2_ortho(field, data):
+    return 5.14*10**(-10)*pow(data['temperature']/(100*Kelvin),0.124-0.018*np.log(data['temperature']/(100*Kelvin)))*kboltz*91.2*Kelvin*CII_abun*data['HI number density']*0.75*data['H2 number density'] /erg
+yt.add_field(("gas", "CII_H2_ortho"), function=_CII_H2_ortho, units="1/cm**6")
 
 #slc = yt.SlicePlot(ds, 'z','rC2a')
 #slc.save('rC2a.png')

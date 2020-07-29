@@ -1,7 +1,0 @@
-import yt as yt
-import numpy as np
-import matplotlib.pyplot as plt
-from derived_field_CII import *
-
-
-def make_slice_plot(dataset,list_or_array):
