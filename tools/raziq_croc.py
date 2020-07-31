@@ -44,25 +44,25 @@ def make_histogram_slice(dataset,list_or_array):
 
 ds = yt.load("~/Data/rei20c1_a0.1667/rei20c1_a0.1667.art")
 
-# all_data_at_z_0 = ds.r[:,:,0]
+all_data_at_z_0 = ds.r[:,:,0]
 
 plot_list = ['HI number density','HII number density','HeI number density','HeII number density','HeIII number density','log_dust_attenuation','rCIIe','rCIIa','CII_e_cooling','CII_a_cooling', 'CII_HeI_cooling', 'CII_CMB_emission','CII_H2_ortho', 'CII_H2_para']
 #plot_list = ['CII_H2_ortho', 'CII_H2_para']
 
-#make_slice_plot(all_data_at_z_0,plot_list)
+make_slice_plot(all_data_at_z_0,plot_list)
 
-#make_histogram_slice(all_data_at_z_0,plot_list)
+make_histogram_slice(all_data_at_z_0,plot_list)
 
-halo_table = Table.read('~/Data/halo_catalogs/out_14.list',format = "ascii.commented_header")
+#halo_table = Table.read('~/Data/halo_catalogs/out_14.list',format = "ascii.commented_header")
 
-halo_table.add_index('Mvir')
+#halo_table.add_index('Mvir')
 
-largest_mass = halo_table[halo_table.loc_indices[np.amax(halo_table['Mvir'])]]
+#largest_mass = halo_table[halo_table.loc_indices[np.amax(halo_table['Mvir'])]]
 
-a = 0.166708
-h = 0.681400
-x = largest_mass['X']*a/h
-y = largest_mass['Y']*a/h
-z = largest_mass['Z']*a/h
-r = largest_mass['Rvir']*a/h
-sphere = ds.sphere([x, y, z],(2*r, "kpc"))
+#a = 0.166708
+#h = 0.681400
+#x = largest_mass['X']*a/h
+#y = largest_mass['Y']*a/h
+#z = largest_mass['Z']*a/h
+#r = largest_mass['Rvir']*a/h
+#sphere = ds.sphere([x, y, z],(2*r, "kpc"))

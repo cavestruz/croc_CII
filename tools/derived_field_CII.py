@@ -1,5 +1,5 @@
 import yt as yt
-from yt.units import Kelvin, gram, kboltz, erg, centimeter
+from yt.units import Kelvin, gram, kboltz, erg, centimeter, second
 import numpy as np
 
 #CODATA RECOMMENDED VALUES OF THE FUNDAMENTAL PHYSICAL CONSTANTS: 2014
@@ -49,40 +49,47 @@ def _log_dust_attenuation(field, data):
 yt.add_field(("gas", "log_dust_attenuation"), function=_log_dust_attenuation, units="")
 
 def _rCIIe(field, data):
-    return 6.67*10**(-20)*Kelvin**(0.5)*np.exp(-91.2*Kelvin/data['temperature'])/data["temperature"]**0.5
-yt.add_field(("gas", "rCIIe"), function=_rCIIe, units="")
+    return 6.67*10**(-20)*Kelvin**(0.5)*np.exp(-91.2*Kelvin/data['temperature'])/data["temperature"]**0.5*erg*centimeter**3/second #Not sure which one contains the per second and why there is a square root of temperature
+yt.add_field(("gas", "rCIIe"), function=_rCIIe, units="erg*cm**3/s")
 
 def _rCIIa(field, data):
     x = 16 + .344*(data['temperature']/Kelvin)**(0.5) - 47.7*Kelvin/data['temperature']
     x[x<0.0]=0
-    return 10**(-24)*np.exp(-91.2*Kelvin/data['temperature'])*x
-yt.add_field(("gas", "rCIIa"), function=_rCIIe, units="")
+    return 10**(-24)*np.exp(-91.2*Kelvin/data['temperature'])*x*erg*centimeter**3/second #Not sure which one contains the per second and why there is a square root of temperature                
+yt.add_field(("gas", "rCIIa"), function=_rCIIe, units="erg*cm**3/s")
 
 def _CII_e_cooling(field, data):
     return data['rCIIe'] * (data['HII number density']+data['HeII number density']+2*data['HeIII number density']) * CII_abun * data['HI number density'] * data['metallicity']
-yt.add_field(("gas", "CII_e_cooling"), function=_CII_e_cooling, units="1/cm**6")
+yt.add_field(("gas", "CII_e_cooling"), function=_CII_e_cooling, units="erg/cm**3/s")
 
 def _CII_a_cooling(field, data):
     return data['rCIIa'] * CII_abun * data['HI number density'] * data['HI number density'] * data['metallicity']
-yt.add_field(("gas", "CII_a_cooling"), function=_CII_a_cooling, units="1/cm**6")
+yt.add_field(("gas", "CII_a_cooling"), function=_CII_a_cooling, units="erg/cm**3/s")
 
 def _CII_HeI_cooling(field, data):
     return 0.38 * data['rCIIa'] * data['HeI number density'] * CII_abun * data['HI number density'] * data['metallicity']
-yt.add_field(("gas", "CII_HeI_cooling"), function=_CII_HeI_cooling, units="1/cm**6")
+yt.add_field(("gas", "CII_HeI_cooling"), function=_CII_HeI_cooling, units="erg/cm**3/s")
 
 def _CII_CMB_emission(field, data):
     z = data.ds.current_redshift
-    return 2.0 *  CII_abun * data['HI number density'] * data['metallicity']*2.298*10**(-6)*kboltz*91.2*Kelvin*np.exp(-91.2*Kelvin/(2.725*Kelvin)*1/(1+z))
-yt.add_field(("gas", "CII_CMB_emission"), function=_CII_CMB_emission, units="erg/cm**3")
+    return 2.0 *  CII_abun * data['HI number density'] * data['metallicity']*2.298*10**(-6)*kboltz*91.2*Kelvin*np.exp(-91.2*Kelvin/(2.725*Kelvin)*1/(1+z))/second # not sure which one contains the per second unit
+yt.add_field(("gas", "CII_CMB_emission"), function=_CII_CMB_emission, units="erg/cm**3/s")
 
 def _CII_H2_para(field, data):
-    rate_coefficient = 4.25*10**(-10)*erg*centimeter**3/second
-    return rate_coefficient*pow(data['temperature']/(100*Kelvin),0.124-0.018*np.log(data['temperature']/(100*Kelvin)))*kboltz*(91.2*Kelvin)*CII_abun*data['HI number density']*0.25*data['H2 number density']
-yt.add_field(("gas", "CII_H2_para"), function=_CII_H2_para, units="erg**2/(cm**3*second)") # Draine Table F6 pg 501
+    """                                                                                                               
+    These are cooling rates, i.e. Lambda*n^2 where Lambda is the cooling function. See https://www.astro.umd.edu/~richard/ASTRO620/A620_2015_Gas_lec2.pdf                  
+    """
+    rate_coefficient = 4.25*10**(-10)*centimeter**3/second*pow(data['temperature']/(100*Kelvin),0.124-0.018*np.log(data['temperature']/(100*Kelvin))) # Draine Table F6 pg 501
+    return rate_coefficient*kboltz*(91.2*Kelvin)*CII_abun*data['HI number density']*0.25*data['H2 number density']
+yt.add_field(("gas", "CII_H2_para"), function=_CII_H2_para, units="erg/cm**3/s")
 
 def _CII_H2_ortho(field, data):
-    return 5.14*10**(-10)*pow(data['temperature']/(100*Kelvin),0.124-0.018*np.log(data['temperature']/(100*Kelvin)))*kboltz*91.2*Kelvin*CII_abun*data['HI number density']*0.75*data['H2 number density'] /erg
-yt.add_field(("gas", "CII_H2_ortho"), function=_CII_H2_ortho, units="1/cm**6")
+    """                                                                                                               
+    These are cooling rates, i.e. Lambda*n^2 where Lambda is the cooling function.. See https://www.astro.umd.edu/~richard/ASTRO620/A620_2015_Gas_lec2.pdf                 
+    """
+    rate_coefficient = (5.14*10**(-10)*centimeter**3/second)*pow(data['temperature']/(100*Kelvin),0.095+0.023*np.log(data['temperature']/(100*Kelvin)))# Draine Table F6 pg 501
+    return rate_coefficient*kboltz*91.2*Kelvin*CII_abun*data['HI number density']*0.75*data['H2 number density']
+yt.add_field(("gas", "CII_H2_ortho"), function=_CII_H2_ortho, units="erg/cm**3/s")
 
 #slc = yt.SlicePlot(ds, 'z','rC2a')
 #slc.save('rC2a.png')
