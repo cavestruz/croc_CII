@@ -9,11 +9,11 @@ def make_slice_plot(dataset,list_or_array):
         ratio = maximum/minimum
 #        print(p+"_"+str(ratio))
         if ratio < 100:
-            slc = yt.SlicePlot(ds, 'z',p,width=(5, "mpc"))
+            slc = yt.SlicePlot(ds, 'z',p)
             slc.set_log(p, False)
             slc.save("../SlicePlots/"+ p + '_sliceplot.png')
         else: 
-            slc = yt.SlicePlot(ds, 'z',p,width=(5, "mpc"))
+            slc = yt.SlicePlot(ds, 'z',p,width=(10,'mpc'))
             slc.save("../SlicePlots/"+ p + '_sliceplot.png')
 
 def make_histogram_slice(dataset,list_or_array):
