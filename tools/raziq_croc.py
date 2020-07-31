@@ -13,7 +13,7 @@ def make_slice_plot(dataset,list_or_array):
             slc.set_log(p, False)
             slc.save("../SlicePlots/"+ p + '_sliceplot.png')
         else: 
-            slc = yt.SlicePlot(ds, 'z',p,width=(10,'mpc'))
+            slc = yt.SlicePlot(ds, 'z',p)
             slc.save("../SlicePlots/"+ p + '_sliceplot.png')
 
 def make_histogram_slice(dataset,list_or_array):
