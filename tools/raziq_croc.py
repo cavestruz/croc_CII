@@ -9,18 +9,22 @@ def make_slice_plot(dataset,list_or_array,full_box=False):
         ratio = maximum/minimum
 #        print(p+"_"+str(ratio))
         if ratio < 100:
-            if full_box = True:
+            if full_box == True:
                 slc = yt.SlicePlot(ds, 'z',p)
-            elif full_box = False:
+            elif full_box == False:
                 slc = yt.SlicePlot(ds, 'z',p,data_source = dataset)
             else:
                 raise ValueError("full_box must be either True or False")
            
             slc.set_log(p, False)
-            slc.save("../SlicePlots/"+ p + '_sliceplot.png')
         else: 
-            slc = yt.SlicePlot(ds, 'z',p)
-            slc.save("../SlicePlots/"+ p + '_sliceplot.png')
+            if full_box == True:
+                slc = yt.SlicePlot(ds, 'z',p)
+            elif full_box == False:
+                slc = yt.SlicePlot(ds, 'z',p,data_source = dataset)
+            else:
+                raise ValueError("full_box must be either True or False")
+        slc.save("../SlicePlots/"+ p + '_sliceplot.png')
 
 def make_histogram_slice(dataset,list_or_array):
 
@@ -50,7 +54,7 @@ def make_histogram_slice(dataset,list_or_array):
 
 ds = yt.load("~/Data/rei20c1_a0.1667/rei20c1_a0.1667.art")
 
-all_data_at_z_0 = ds.r[:,:,0]
+#all_data_at_z_0 = ds.r[:,:,0]
 
 #plot_list = ['HI number density','HII number density','HeI number density','HeII number density','HeIII number density','log_dust_attenuation','rCIIe','rCIIa','CII_e_cooling','CII_a_cooling', 'CII_HeI_cooling', 'CII_CMB_emission','CII_H2_ortho', 'CII_H2_para']
 plot_list = ['CII_H2_ortho', 'CII_H2_para']
@@ -59,7 +63,7 @@ plot_list = ['CII_H2_ortho', 'CII_H2_para']
 
 #make_histogram_slice(all_data_at_z_0,plot_list)
 
-halo_table = Table.read('~/Data/halo_catalogs/out_14.list',format = "ascii.commented_header")
+halo_table = Table.read('/home/rnoorali/Data/halo_catalogs/out_14.list',format = "ascii.commented_header")
 
 halo_table.add_index('Mvir')
 
@@ -74,3 +78,4 @@ r = largest_mass['Rvir']*a/h
 sphere = ds.sphere([x, y, z],(2*r, "kpc"))
 
 make_slice_plot(sphere,plot_list)
+make_histogram_slice(sphere,plot_list)
