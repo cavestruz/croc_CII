@@ -12,7 +12,7 @@ def make_slice_plot(dataset,list_or_array,full_box=False):
             if full_box == True:
                 slc = yt.SlicePlot(ds, 'z',p)
             elif full_box == False:
-                slc = yt.SlicePlot(ds, 'z',p,data_source = dataset)
+                slc = yt.SlicePlot(ds, 'z',p,data_source = dataset,center = dataset['data_object'].center,width = dataset['width'])
             else:
                 raise ValueError("full_box must be either True or False")
            
@@ -21,7 +21,7 @@ def make_slice_plot(dataset,list_or_array,full_box=False):
             if full_box == True:
                 slc = yt.SlicePlot(ds, 'z',p)
             elif full_box == False:
-                slc = yt.SlicePlot(ds, 'z',p,data_source = dataset)
+                slc = yt.SlicePlot(ds, 'z',p,data_source = dataset,center = dataset['data_object'].center,width = dataset['width'])
             else:
                 raise ValueError("full_box must be either True or False")
         slc.save("../SlicePlots/"+ p + '_sliceplot.png')
@@ -51,6 +51,15 @@ def make_histogram_slice(dataset,list_or_array):
             plt.ylabel('Frequency')
             plt.savefig("../Histograms/"+ p + '_histogram.png')
             plt.clf()
+def make_sphere_region(row_of_table):
+    a = 1/(1+ds.current_redshift)
+    h = ds.hubble_constant
+    x = row_of_table['X']*a/h
+    y = row_of_table['Y']*a/h
+    z = row_of_table['Z']*a/h
+    r = row_of_table['Rvir']*a/h
+    sphere = ds.sphere(yt.YTArray([x, y, z],"Mpc"),(2*r, "kpc"))
+    return {'data_object':sphere,'width':2*sphere.radius)
 
 ds = yt.load("~/Data/rei20c1_a0.1667/rei20c1_a0.1667.art")
 
@@ -69,13 +78,7 @@ halo_table.add_index('Mvir')
 
 largest_mass = halo_table[halo_table.loc_indices[np.amax(halo_table['Mvir'])]]
 
-a = 1/(1+ds.current_redshift)
-h = ds.hubble_constant
-x = largest_mass['X']*a/h
-y = largest_mass['Y']*a/h
-z = largest_mass['Z']*a/h
-r = largest_mass['Rvir']*a/h
-sphere = ds.sphere([x, y, z],(2*r, "kpc"))
+sphere = make_sphere_region(largest_mass)
 
 make_slice_plot(sphere,plot_list)
 make_histogram_slice(sphere,plot_list)
