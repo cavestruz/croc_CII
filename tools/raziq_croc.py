@@ -9,10 +9,10 @@ def make_slice_plot(dataset,list_or_array,full_box=False):
         ratio = maximum/minimum
 #        print(p+"_"+str(ratio))
         if ratio < 100:
-            slc = yt.SlicePlot(ds, 'z',p,data_source = dataset,center = dataset['data_object'].center,width = dataset['width'])
+            slc = yt.SlicePlot(ds, 'z',p,data_source = dataset['data_object'],center = dataset['data_object'].center,width = dataset['width'])
             slc.set_log(p, False)
         else: 
-            slc = yt.SlicePlot(ds, 'z',p,data_source = dataset,center = dataset['data_object'].center,width = dataset['width'])
+            slc = yt.SlicePlot(ds, 'z',p,data_source = dataset['data_object'],center = dataset['data_object'].center,width = dataset['width'])
 
         slc.save("../SlicePlots/"+ p + '_sliceplot.png')
 
@@ -53,12 +53,12 @@ def make_sphere_region(row_of_table):
 
 ds = yt.load("~/Data/rei20c1_a0.1667/rei20c1_a0.1667.art")
 
-entire_box = {ds.region('data_object':ds.domain_center, ds.domain_left_edge, ds.domain_right_edge),'width':128} # Equivilently all_data()
+#entire_box = {'data_object':ds.region(ds.domain_center, ds.domain_left_edge, ds.domain_right_edge),'width':128}#Equivilently all_data()
 
 #all_data_at_z_0 = ds.r[:,:,0]
 
-#plot_list = ['HI number density','HII number density','HeI number density','HeII number density','HeIII number density','log_dust_attenuation','rCIIe','rCIIa','CII_e_cooling','CII_a_cooling', 'CII_HeI_cooling', 'CII_CMB_emission','CII_H2_ortho', 'CII_H2_para']
-plot_list = ['CII_H2_ortho', 'CII_H2_para']
+plot_list = ['HI number density','HII number density','HeI number density','HeII number density','HeIII number density','log_dust_attenuation','rCIIe','rCIIa','CII_e_cooling','CII_a_cooling', 'CII_HeI_cooling', 'CII_CMB_emission','CII_H2_ortho', 'CII_H2_para']
+#plot_list = ['CII_H2_ortho', 'CII_H2_para']
 
 #make_slice_plot(all_data_at_z_0,plot_list)
 
