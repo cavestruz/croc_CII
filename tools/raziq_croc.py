@@ -59,9 +59,11 @@ def make_sphere_region(row_of_table):
     z = row_of_table['Z']*a/h
     r = row_of_table['Rvir']*a/h
     sphere = ds.sphere(yt.YTArray([x, y, z],"Mpc"),(2*r, "kpc"))
-    return {'data_object':sphere,'width':2*sphere.radius)
+    return {'data_object':sphere,'width':2*sphere.radius}
 
 ds = yt.load("~/Data/rei20c1_a0.1667/rei20c1_a0.1667.art")
+
+entire_box = ds.region(ds.domain_center, ds.domain_left_edge, ds.domain_right_edge) # Equivilently all_data()
 
 #all_data_at_z_0 = ds.r[:,:,0]
 
