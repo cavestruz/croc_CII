@@ -4,36 +4,26 @@ from astropy.table import Table
 
 def make_slice_plot(dataset,list_or_array,full_box=False):
     for p in list_or_array:
-        minimum = np.amin(dataset[p])
-        maximum = np.amax(dataset[p])
+        minimum = np.amin(dataset['data_object'][p])
+        maximum = np.amax(dataset['data_object'][p])
         ratio = maximum/minimum
 #        print(p+"_"+str(ratio))
         if ratio < 100:
-            if full_box == True:
-                slc = yt.SlicePlot(ds, 'z',p)
-            elif full_box == False:
-                slc = yt.SlicePlot(ds, 'z',p,data_source = dataset,center = dataset['data_object'].center,width = dataset['width'])
-            else:
-                raise ValueError("full_box must be either True or False")
-           
+            slc = yt.SlicePlot(ds, 'z',p,data_source = dataset,center = dataset['data_object'].center,width = dataset['width'])
             slc.set_log(p, False)
         else: 
-            if full_box == True:
-                slc = yt.SlicePlot(ds, 'z',p)
-            elif full_box == False:
-                slc = yt.SlicePlot(ds, 'z',p,data_source = dataset,center = dataset['data_object'].center,width = dataset['width'])
-            else:
-                raise ValueError("full_box must be either True or False")
+            slc = yt.SlicePlot(ds, 'z',p,data_source = dataset,center = dataset['data_object'].center,width = dataset['width'])
+
         slc.save("../SlicePlots/"+ p + '_sliceplot.png')
 
 def make_histogram_slice(dataset,list_or_array):
 
     for p in list_or_array:
-        minimum = np.amin(dataset[p])
-        maximum = np.amax(dataset[p])
+        minimum = np.amin(dataset['data_object'][p])
+        maximum = np.amax(dataset['data_object'][p])
         ratio = abs(maximum/minimum)
         if ratio < 100:
-            x,bin_edges = np.histogram(dataset[p],bins = 100) 
+            x,bin_edges = np.histogram(dataset['data_object'][p],bins = 100) 
             plt.bar(bin_edges[:-1], x,width = bin_edges[1]-bin_edges[0])
             plt.title(p)
             plt.xlabel(p)
@@ -43,7 +33,7 @@ def make_histogram_slice(dataset,list_or_array):
 
         else:
 
-            x,bin_edges = np.histogram(np.log10(dataset[p]+0j),bins = np.arange(np.around(np.log10(minimum+0j))-1,np.around(np.log10(maximum+0j))+1)) 
+            x,bin_edges = np.histogram(np.log10(dataset['data_object'][p]+0j),bins = np.arange(np.around(np.log10(minimum+0j))-1,np.around(np.log10(maximum+0j))+1)) 
             plt.bar(bin_edges[:-1], x, width = 1) 
             plt.xlim(min(bin_edges), max(bin_edges))
             plt.title(p )
@@ -63,7 +53,7 @@ def make_sphere_region(row_of_table):
 
 ds = yt.load("~/Data/rei20c1_a0.1667/rei20c1_a0.1667.art")
 
-entire_box = ds.region(ds.domain_center, ds.domain_left_edge, ds.domain_right_edge) # Equivilently all_data()
+entire_box = {ds.region('data_object':ds.domain_center, ds.domain_left_edge, ds.domain_right_edge),'width':128} # Equivilently all_data()
 
 #all_data_at_z_0 = ds.r[:,:,0]
 
