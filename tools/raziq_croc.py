@@ -26,7 +26,7 @@ def make_histogram_slice(dataset,list_or_array,log_frequency=False):
             x,bin_edges = np.histogram(dataset['data_object'][p],bins = 100) 
             plt.bar(bin_edges[:-1], x,width = bin_edges[1]-bin_edges[0])
             plt.title(p)
-            plt.xlabel(p+' '+str(dataset['data_object'][p].units))
+            plt.xlabel(p+' ('+str(dataset['data_object'][p].units)+')')
             plt.ylabel('Frequency')
             if log_frequency == True:
                 plt.yscale('log')
@@ -37,7 +37,7 @@ def make_histogram_slice(dataset,list_or_array,log_frequency=False):
             plt.bar(bin_edges[:-1], x, width = 1) 
             plt.xlim(min(bin_edges), max(bin_edges))
             plt.title(p )
-            plt.xlabel('log10('+p+' '+str(dataset['data_object'][p].units))
+            plt.xlabel('log10('+p+') ('+str(dataset['data_object'][p].units)+')')
             plt.ylabel('Frequency')
             if log_frequency == True:
                 plt.yscale('log')
@@ -60,7 +60,7 @@ ds = yt.load("~/Data/rei20c1_a0.1667/rei20c1_a0.1667.art")
 #all_data_at_z_0 = ds.r[:,:,0]
 
 #plot_list = ['HI number density','HII number density','HeI number density','HeII number density','HeIII number density','log_dust_attenuation','rCIIe','rCIIa','CII_e_cooling','CII_a_cooling', 'CII_HeI_cooling', 'CII_CMB_emission','CII_H2_ortho', 'CII_H2_para']
-plot_list = ['log_dust_attenuation','rCIIe','rCIIa']
+plot_list = ['temperature','metallicity']
 
 halo_table = Table.read('/home/rnoorali/Data/halo_catalogs/out_14.list',format = "ascii.commented_header")
 
@@ -70,5 +70,5 @@ largest_mass = halo_table[halo_table.loc_indices[np.amax(halo_table['Mvir'])]]
 
 sphere = make_sphere_region(largest_mass)
 
-#make_slice_plot(sphere,plot_list)
-make_histogram_slice(sphere,plot_list,log_frequency=True)
+make_slice_plot(sphere,plot_list)
+make_histogram_slice(sphere,plot_list)
