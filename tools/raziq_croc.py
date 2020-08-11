@@ -43,14 +43,14 @@ def make_histogram_slice(dataset,list_or_array,log_frequency=False):
                 plt.yscale('log')
         plt.savefig("../Histograms/"+ p + '_histogram.png')
         plt.clf()
-def make_sphere_region(row_of_table):
+def make_sphere_region(row_of_table,zoom_factor = 1.0):
     a = 1/(1+ds.current_redshift)
     h = ds.hubble_constant
     x = row_of_table['X']*a/h
     y = row_of_table['Y']*a/h
     z = row_of_table['Z']*a/h
     r = row_of_table['Rvir']*a/h
-    sphere = ds.sphere(yt.YTArray([x, y, z],"Mpc"),(2*r, "kpc"))
+    sphere = ds.sphere(yt.YTArray([x, y, z],"Mpc"),(2*r/zoom_factor, "kpc"))
     return {'data_object':sphere,'width':2*sphere.radius}
 
 ds = yt.load("~/Data/rei20c1_a0.1667/rei20c1_a0.1667.art")
@@ -59,8 +59,8 @@ ds = yt.load("~/Data/rei20c1_a0.1667/rei20c1_a0.1667.art")
 
 #all_data_at_z_0 = ds.r[:,:,0]
 
-#plot_list = ['HI number density','HII number density','HeI number density','HeII number density','HeIII number density','log_dust_attenuation','rCIIe','rCIIa','CII_e_cooling','CII_a_cooling', 'CII_HeI_cooling', 'CII_CMB_emission','CII_H2_ortho', 'CII_H2_para']
-plot_list = ['temperature','metallicity']
+plot_list = ['temperature','metallicity','HI number density','HII number density','HeI number density','HeII number density','HeIII number density','log_dust_attenuation','rCIIe','rCIIa','CII_e_cooling','CII_a_cooling', 'CII_HeI_cooling', 'CII_CMB_emission','CII_H2_ortho', 'CII_H2_para']
+#plot_list = ['temperature','metallicity']
 
 halo_table = Table.read('/home/rnoorali/Data/halo_catalogs/out_14.list',format = "ascii.commented_header")
 
@@ -68,7 +68,10 @@ halo_table.add_index('Mvir')
 
 largest_mass = halo_table[halo_table.loc_indices[np.amax(halo_table['Mvir'])]]
 
-sphere = make_sphere_region(largest_mass)
+sphere = make_sphere_region(largest_mass,zoom_factor=14.0)
 
 make_slice_plot(sphere,plot_list)
 make_histogram_slice(sphere,plot_list)
+
+plot_list = ['log_dust_attenuation','rCIIe','rCIIa']
+make_histogram_slice(sphere,plot_list,log_frequency=True)
