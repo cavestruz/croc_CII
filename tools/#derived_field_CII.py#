@@ -18,10 +18,6 @@ CII_abun = 3.31*10**(-4)
 
 ### All mass values come from the CRC Handbook of Chemistry and Physics May 2020
 
-def _test_mass(field, data):
-    return data["HI density"]/data["HI density"]*(1.007825032*amu)
-yt.add_field(("gas", "test_mass"), function=_test_mass, units="g")
-
 def _HI_number_density(field, data):
     return data["HI density"]/(1.007825032*amu)
 yt.add_field(("gas", "HI number density"), function=_HI_number_density, units="1/cm**3")
