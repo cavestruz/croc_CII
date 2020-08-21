@@ -2,12 +2,33 @@ from derived_field_CII import * # Contains yt and numpy
 import matplotlib.pyplot as plt
 from astropy.table import Table
 
-def make_slice_plot(dataset,list_or_array,full_box=False):
+def make_slice_plot(dataset,list_or_array):
+    """
+    Takes a given dataset and width and makes a slice plot along the z axis. 
+    Includes infrastructure to plot log based or linear based on overall ratio 
+    of highest to lowest values. 
+    Future development includes including a way to specify which axis to slice
+    on and how to appropriately determine when to take the log
+
+    **Parameters**
+
+    :dataset: dictionary
+    
+         dictionary in the form of {'data_object':<yt.data_object>,'width':<float in kpc>}
+    
+    :list_or_array: iterable python data structure, e.g. list, array, etc.. 
+         
+         This represents the fields in yt in which we want to make sliceplots en
+         masse. Choosing a field name not in yt will return an error. Future
+         development includes adding a config file to choose fields manually
+         
+
+    """
     for p in list_or_array:
         minimum = np.amin(dataset['data_object'][p])
         maximum = np.amax(dataset['data_object'][p])
         ratio = maximum/minimum
-#        print(p+"_"+str(ratio))
+#        print(p+"_"+str(ratio)) # For testing of log vs linear
         if ratio < 100:
             slc = yt.SlicePlot(ds, 'z',p,data_source = dataset['data_object'],center = dataset['data_object'].center,width = dataset['width'])
             slc.set_log(p, False)
@@ -17,6 +38,31 @@ def make_slice_plot(dataset,list_or_array,full_box=False):
         slc.save("../SlicePlots/"+ p + '_sliceplot.png')
 
 def make_histogram_slice(dataset,list_or_array,log_frequency=False):
+
+    """
+    Takes a given dataset and makes a histogram of all values in the set. 
+    Includes infrastructure to plot either log based or linear based values
+    categorical values (ratio), as well as log based or linear based frequencies.  
+    Future development includes including how to autmatically determine when to take the log of categories and log of frequencies. 
+
+    **Parameters**
+
+    :dataset: dictionary
+    
+         dictionary in the form of {'data_object':<yt.data_object>,'width':<float in kpc>}
+    
+    :list_or_array: iterable python data structure, e.g. list, array, etc.. 
+         
+         This represents the fields in yt in which we want to make sliceplots en
+         masse. Choosing a field name not in yt will return an error. Future
+         development includes adding a config file to choose fields manually
+
+    :log_frequency: boolean, optional
+    
+         Sets the frequency axis to log10
+         
+
+    """
 
     for p in list_or_array:
         minimum = np.amin(dataset['data_object'][p])
@@ -44,6 +90,25 @@ def make_histogram_slice(dataset,list_or_array,log_frequency=False):
         plt.savefig("../Histograms/"+ p + '_histogram.png')
         plt.clf()
 def make_sphere_region(row_of_table,zoom_factor = 1.0):
+    """
+    Takes a specified row in DM halo catalog and makes a spherical region file 
+    around it. Auto converts from comoving coordinates. 
+
+    **Parameters**
+
+    :row_of_table: astropy.Table Table
+
+         Astropy table containing at least the coordinates and the virial radius
+         of the DM halo. 
+
+    :zoom_factor: float, optional
+    
+         Used to create a region file zoomed in on the origin. The larger the
+         factor, the more zoomed in the region. Defaults to creating a region
+         twice the radius of the virial radius
+
+
+    """
     a = 1/(1+ds.current_redshift)
     h = ds.hubble_constant
     x = row_of_table['X']*a/h

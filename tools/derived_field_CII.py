@@ -2,49 +2,93 @@ import yt as yt
 from yt.units import Kelvin, gram, kboltz, erg, centimeter, second
 import numpy as np
 
-#CODATA RECOMMENDED VALUES OF THE FUNDAMENTAL PHYSICAL CONSTANTS: 2014
+### CODATA RECOMMENDED VALUES OF THE FUNDAMENTAL PHYSICAL CONSTANTS: 2014
 amu = 1.660539040*10**(-24)*gram # atomic mass unit to kilograms
 
 parsec = 3.085678 * 10**(18) * centimeter # parsec to meters
 
 electron_mass = 5.48579909070*10**(-4) * amu
 
-L_soblen = 100. * parsec
+### Specific units from c_emission.c
 
-dust_cross_section = 2*10**(-21) * centimeter * centimeter
+L_soblen = 100. * parsec # Not sure how this unit was derived
 
-CII_abun = 3.31*10**(-4)
+dust_cross_section = 2*10**(-21) * centimeter * centimeter # Not sure how this unit was derived
+
+CII_abun = 3.31*10**(-4) # Not sure how this unit was derived
 
 
 ### All mass values come from the CRC Handbook of Chemistry and Physics May 2020
 
+<<<<<<< HEAD
+H_mass = 1.007825032*amu
+
+H2_mass = 2.016*amu
+
+He_mass = 4.002602*amu
+
+### Conversions to YTEP-0003 compatible fields for use in Trident
+
+def _H_p0_density_YTEP_0003(field,data):
+    return data["HI density"].copy()
+yt.add_field(("gas", "H_p0_density"), function=_H_p0_density_YTEP_0003, units="g/cm**3")
+
+def _H_p1_density_YTEP_0003(field,data):
+    return data["HII density"].copy()
+yt.add_field(("gas", "H_p1_density"), function=_H_p1_density_YTEP_0003, units="g/cm**3")
+
+def _H2_p0_density_YTEP_0003(field,data):
+    return data["H2 density"].copy()
+yt.add_field(("gas", "H2_p0_density"), function=_H2_p0_density_YTEP_0003, units="g/cm**3")
+
+def _He_p0_density_YTEP_0003(field,data):
+    return data["HeI density"].copy()
+yt.add_field(("gas", "He_p0_density"), function=_He_p0_density_YTEP_0003, units="g/cm**3")
+
+def _He_p1_density_YTEP_0003(field,data):
+    return data["HeII density"].copy()
+yt.add_field(("gas", "He_p1_density"), function=_He_p1_density_YTEP_0003, units="g/cm**3")
+
+def _He_p2_density_YTEP_0003(field,data):
+    return data["HeIII density"].copy()
+yt.add_field(("gas", "He_p2_density"), function=_He_p2_density_YTEP_0003, units="g/cm**3")
+
+### Functions from cII_emission.c
+=======
 def _test_mass(field, data):
     return data["HI density"]/data["HI density"]*(1.007825032*amu)
 yt.add_field(("gas", "test_mass"), function=_test_mass, units="g")
+>>>>>>> 2b8736913fff87feb8afd4fbaafc9482faad42da
 
 def _HI_number_density(field, data):
-    return data["HI density"]/(1.007825032*amu)
+                 return data["HI density"]/(H_mass)
 yt.add_field(("gas", "HI number density"), function=_HI_number_density, units="1/cm**3")
+yt.add_field(("gas", "H_p0_number_density"), function=_HI_number_density, units="1/cm**3") # Adds additional field for YTEP 0003 and Trident compatability
 
 def _HII_number_density(field, data):
-    return data["HII density"]/(1.007825032*amu-electron_mass)
+    return data["HII density"]/(H_mass-electron_mass)
 yt.add_field(("gas", "HII number density"), function=_HII_number_density, units="1/cm**3")
+yt.add_field(("gas", "H_p1_number_density"), function=_HII_number_density, units="1/cm**3")# Adds additional field for YTEP 0003 and Trident compatability
 
 def _H2_number_density(field, data):
-    return data["H2 density"]/(2.016*amu)
+    return data["H2 density"]/(H2_mass)
 yt.add_field(("gas", "H2 number density"), function=_H2_number_density, units="1/cm**3")
+yt.add_field(("gas", "H2_p0_number_density"), function=_H2_number_density, units="1/cm**3")# Adds additional field for YTEP 0003 and Trident compatability
 
 def _HeI_number_density(field, data):
-    return data["HeI density"]/(4.002602*amu)
+    return data["HeI density"]/(He_mass)
 yt.add_field(("gas", "HeI number density"), function=_HeI_number_density, units="1/cm**3")
+yt.add_field(("gas", "He_p0_number_density"), function=_HeI_number_density, units="1/cm**3")# Adds additional field for YTEP 0003 and Trident compatability
 
 def _HeII_number_density(field, data):
-    return data["HeII density"]/(4.00260*amu-electron_mass)
+    return data["HeII density"]/(He_mass-electron_mass)
 yt.add_field(("gas", "HeII number density"), function=_HeII_number_density, units="1/cm**3")
+yt.add_field(("gas", "He_p1_number_density"), function=_HeII_number_density, units="1/cm**3")# Adds additional field for YTEP 0003 and Trident compatability
 
 def _HeIII_number_density(field, data):
-    return data["HeIII density"]/(4.00260*amu-2*electron_mass)
+    return data["HeIII density"]/(He_mass-2*electron_mass)
 yt.add_field(("gas", "HeIII number density"), function=_HeIII_number_density, units="1/cm**3")
+yt.add_field(("gas", "He_p2_number_density"), function=_HeIII_number_density, units="1/cm**3")# Adds additional field for YTEP 0003 and Trident compatability
 
 def _log_dust_attenuation(field, data):
     return -(data["HI number density"]+2*data["H2 number density"])*data['metallicity']*L_soblen*dust_cross_section # With H2
