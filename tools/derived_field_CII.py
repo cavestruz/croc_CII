@@ -20,7 +20,7 @@ CII_abun = 3.31*10**(-4) # Not sure how this unit was derived
 
 ### All mass values come from the CRC Handbook of Chemistry and Physics May 2020
 
-<<<<<<< HEAD
+
 H_mass = 1.007825032*amu
 
 H2_mass = 2.016*amu
@@ -54,11 +54,10 @@ def _He_p2_density_YTEP_0003(field,data):
 yt.add_field(("gas", "He_p2_density"), function=_He_p2_density_YTEP_0003, units="g/cm**3")
 
 ### Functions from cII_emission.c
-=======
+
 def _test_mass(field, data):
     return data["HI density"]/data["HI density"]*(1.007825032*amu)
 yt.add_field(("gas", "test_mass"), function=_test_mass, units="g")
->>>>>>> 2b8736913fff87feb8afd4fbaafc9482faad42da
 
 def _HI_number_density(field, data):
                  return data["HI density"]/(H_mass)
