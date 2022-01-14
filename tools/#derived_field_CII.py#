@@ -137,7 +137,10 @@ def _CII_H2_ortho(field, data):
     return rate_coefficient*kboltz*91.2*Kelvin*CII_abun*data['HI number density']*0.75*data['H2 number density']
 yt.add_field(("gas", "CII_H2_ortho"), function=_CII_H2_ortho, units="erg/cm**3/s",sampling_type="local")
 
-
+def _CII_HeI_cooling(field, data):
+    return 
+yt.add_field(("gas", "CII_HeI_cooling"), function=_CII_HeI_cooling, units="erg/\
+cm**3/s",sampling_type="local")
 
 
 
