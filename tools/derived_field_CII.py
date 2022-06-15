@@ -1,4 +1,5 @@
 import yt as yt
+from unyt import unyt_array
 from yt.units import Kelvin, gram, kboltz, erg, centimeter, second
 import numpy as np
 
@@ -75,7 +76,7 @@ def _H2_number_density(field, data):
 yt.add_field(("gas", "H2_number_density"), function=_H2_number_density, units="1/cm**3",sampling_type="local")# Adds additional field for YTEP 0003 and Trident compatability
 
 def _HeI_number_density(field, data):
-    return data["He_p0_density"]/(He_mass)
+    return data["He_density"]/(He_mass)
 # yt.add_field(("gas", "HeI number density"), function=_HeI_number_density, units="1/cm**3",sampling_type="local")
 yt.add_field(("gas", "He_number_density"), function=_HeI_number_density, units="1/cm**3",sampling_type="local")# Adds additional field for YTEP 0003 and Trident compatability
 
@@ -125,7 +126,7 @@ def _CII_H2_para(field, data):
     """                                                                                                               
     These are cooling rates, i.e. Lambda*n^2 where Lambda is the cooling function. See https://www.astro.umd.edu/~richard/ASTRO620/A620_2015_Gas_lec2.pdf                  
     """
-    rate_coefficient = 4.25*10**(-10)*centimeter**3/second*pow(data['temperature']/(100*Kelvin),0.124-0.018*np.log(data['temperature']/(100*Kelvin))) # Draine Table F6 pg 501
+    rate_coefficient = 4.25*10**(-10)*centimeter**3/second*unyt_array(pow(data['temperature'].to_ndarray()/(100),0.124-0.018*np.log(data['temperature'].to_ndarray()/(100))))# Draine Table F6 pg 501
     return rate_coefficient*kboltz*(91.2*Kelvin)*CII_abun*data['H_number_density']*0.25*data['H2_number_density']
 yt.add_field(("gas", "CII_H2_para"), function=_CII_H2_para, units="erg/cm**3/s",sampling_type="local")
 
@@ -133,14 +134,14 @@ def _CII_H2_ortho(field, data):
     """                                                                                                               
     These are cooling rates, i.e. Lambda*n^2 where Lambda is the cooling function.. See https://www.astro.umd.edu/~richard/ASTRO620/A620_2015_Gas_lec2.pdf                 
     """
-    rate_coefficient = (5.14*10**(-10)*centimeter**3/second)*pow(data['temperature']/(100*Kelvin),0.095+0.023*np.log(data['temperature']/(100*Kelvin)))# Draine Table F6 pg 501
+    rate_coefficient = (5.14*10**(-10)*centimeter**3/second)*unyt_array(pow(data['temperature'].to_ndarray()/(100),0.095+0.023*np.log(data['temperature'].to_ndarray()/(100))))# Draine Table F6 pg 501
     return rate_coefficient*kboltz*91.2*Kelvin*CII_abun*data['H_number_density']*0.75*data['H2_number_density']
 yt.add_field(("gas", "CII_H2_ortho"), function=_CII_H2_ortho, units="erg/cm**3/s",sampling_type="local")
 
 
 def _LCII_e(field, data):
     """                                                                                                               
-    CII Luminosity of electrons
+    CII Point Luminosity of electrons
     """
     return data['CII_e_cooling']*(data['H_p1_number_density']+data['He_p1_number_density']+2*data['He_p2_number_density']) *data['cell_volume']
     
@@ -148,7 +149,7 @@ yt.add_field(("gas", "LCII_e"), function=_LCII_e, units="erg/cm**3/s",sampling_t
 
 def _LCII_a(field, data):
     """                                                                                                               
-    CII Luminosity of electrons
+    CII Point Luminosity of electrons
     """
     return data['CII_a_cooling']*(data['H_number_density'])*data['cell_volume']
     
@@ -156,7 +157,7 @@ yt.add_field(("gas", "LCII_a"), function=_LCII_a, units="erg/cm**3/s",sampling_t
 
 def _LCII_HeI(field, data):
     """                                                                                                               
-    CII Luminosity of electrons
+    CII Point Luminosity of electrons
     """
     return data['CII_HeI_cooling']*(data['He_number_density'])*data['cell_volume']
     
@@ -164,7 +165,7 @@ yt.add_field(("gas", "LCII_HeI"), function=_LCII_HeI, units="erg/cm**3/s",sampli
 
 def _LCII_CMB(field, data):
     """                                                                                                               
-    CII Luminosity of CMB
+    CII Point Luminosity of CMB
     """
     return data['CII_CMB_emission']*(413 /(centimeter**3))*data['cell_volume']
     
@@ -172,21 +173,30 @@ yt.add_field(("gas", "LCII_CMB"), function=_LCII_CMB, units="erg/cm**3/s",sampli
 
 
 
-# def _LCII_H2_ortho(field, data):
-#     """                                                                                                               
-#     CII Luminosity of electrons
-#     """
-#     return data['CII_H2_ortho']*0.75*(data['H2 number density'])*data['cell_volume']
+def _LCII_H2_ortho(field, data):
+    """                                                                                                               
+    CII Point Luminosity of electrons
+    """
+    return data['CII_H2_ortho']*0.75*(data['H2_number_density'])*data['cell_volume']
     
-# yt.add_field(("gas", "LCII_H2_ortho"), function=_LCII_H2_ortho, units="erg/cm**3/s",sampling_type="local")
+yt.add_field(("gas", "LCII_H2_ortho"), function=_LCII_H2_ortho, units="erg/cm**3/s",sampling_type="local")
 
-# def _LCII_H2_para(field, data):
-#     """                                                                                                               
-#     CII Luminosity of electrons
-#     """
-#     return data['CII_H2_para']*0.25*(data['H2 number density'])*data['cell_volume']
+def _LCII_H2_para(field, data):
+    """                                                                                                               
+    CII Point Luminosity of electrons
+    """
+    return data['CII_H2_para']*0.25*(data['H2_number_density'])*data['cell_volume']
     
-# yt.add_field(("gas", "LCII_H2_para"), function=_LCII_H2_para, units="erg/cm**3/s",sampling_type="local")
+yt.add_field(("gas", "LCII_H2_para"), function=_LCII_H2_para, units="erg/cm**3/s",sampling_type="local")
+
+def _LCII_total(field, data):
+    """                                                                                                               
+    CII Point Luminosity of electrons
+    """
+    return data['LCII_e']+data['LCII_a']+data['LCII_HeI']+data['LCII_CMB']+data['LCII_H2_ortho']+data['LCII_H2_para']
+    
+yt.add_field(("gas", "LCII_total"), function=_LCII_total, units="erg/cm**3/s",sampling_type="local")
+
 
 
 
