@@ -45,8 +45,11 @@ def make_masked_slice_plot(dataset,list_or_array,mask_list_or_array):
     Takes a given dataset and width and makes a slice plot along the z axis. 
     Includes infrastructure to plot log based or linear based on overall ratio 
     of highest to lowest values. 
+    
+    Also includes lower limit mask option
+
     Future development includes including a way to specify which axis to slice
-    on and how to appropriately determine when to take the log
+    on and how to appropriately determine when to take the log, and more rhobust masking option
 
     **Parameters**
 

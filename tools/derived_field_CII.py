@@ -28,6 +28,22 @@ H2_mass = 2.016*amu
 
 He_mass = 4.002602*amu
 
+
+### Added particle filed to filter out for young stars only
+
+def young_stars(pfilter, data):
+    age = data.ds.current_time - data[pfilter.filtered_type, "creation_time"]
+    filter = np.logical_and(age.in_units("Myr") <= 20, age >= 0)
+    return filter
+
+
+yt.add_particle_filter(
+    "young_stars",
+    function=young_stars,
+    filtered_type="STAR",
+    requires=["creation_time"],
+)
+
 ### Conversions to YTEP-0003 compatible fields for use in Trident
 
 # def _H_p0_density_YTEP_0003(field,data):
