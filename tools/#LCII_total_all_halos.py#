@@ -38,24 +38,19 @@ ds.add_particle_filter("young_stars")
 
 col_list = ['LCII_total_ave','sphere_vol','SFR']
 
-#try:
-# halo_table = Table.read('/home/rnoorali/Data/rnoorali_turbo/LCII_total_all_halos.txt',format = "ascii.commented_header")
-#print(halo_table.colnames)
-#except FileNotFoundError:
-#    print('Error!')
-halo_table = Table.read('/home/rnoorali/Data/halo_catalogs/out_14.list',format = "ascii.commented_header")
+try:
+    halo_table = Table.read('/home/rnoorali/Data/rnoorali_turbo/LCII_total_all_halos.txt',format = "ascii.commented_header")
+except:
+    halo_table = Table.read('/home/rnoorali/Data/halo_catalogs/out_14.list',format = "ascii.commented_header")
+    for table_col in col_list:
+        halo_table[table_col] = -0.0123
+
 for table_col in col_list:
     halo_table[table_col] = -0.0123
-
-for row in halo_table['ID']:
-    if halo_table['LCII_total_ave'][row]>0:
+for row in halo_table['ID']:    if halo_table['LCII_total_ave'][row]!=-0.0123:
         print('Row',row,'is already filled')
         continue
-    elif row == 44806:
-        continue
-#     elif row == 37318:
-#         continue
-#     print(str(row))
+    
     sphere = make_sphere_region(halo_table[row])
     data = sphere['data_object']
     radius = sphere['width'].to('cm')/2.0
@@ -63,7 +58,6 @@ for row in halo_table['ID']:
     halo_table['sphere_vol'][row] = 4.0/3.0 * np.pi * radius**3
     total_young_star_mass = data.quantities.total_quantity(('STAR','particle_mass'))
     halo_table['SFR'][row] = total_young_star_mass.to('Msun')/20/10**6
-    print(str(row))
     
     if row%100 ==0:
         halo_table.write('/home/rnoorali/Data/rnoorali_turbo/LCII_total_all_halos.txt',format='ascii',overwrite=True)
@@ -72,7 +66,7 @@ for row in halo_table['ID']:
 #    if row>=25:
 #        print('Test Completed')
 #        break
-halo_table.write('/home/rnoorali/Data/rnoorali_turbo/LCII_total_all_halos_2.txt',format='ascii',overwrite=True)
+halo_table.write('/home/rnoorali/Data/rnoorali_turbo/LCII_total_all_halos.txt',format='ascii',overwrite=True)
 
 
 
