@@ -33,17 +33,16 @@ He_mass = 4.002602*amu
 
 ### Added particle filed to filter out for young stars only
 
-def young_stars(pfilter, data):
-    age = data.ds.current_time - data[pfilter.filtered_type, "creation_time"]
-    filter = np.logical_and(age.in_units("Myr") <= 20, age >= 0)
-    return filter
+def _young_stars(pfilter, data):
+    
+    return data[(pfilter.filtered_type, "age")].in_units('Myr')<=20.
 
 
 yt.add_particle_filter(
     "young_stars",
-    function=young_stars,
+    function=_young_stars,
     filtered_type="STAR",
-    requires=["creation_time"],
+    requires=["age"],
 )
 
 ### Conversions to YTEP-0003 compatible fields for use in Trident
@@ -157,37 +156,37 @@ def _CII_H2_ortho(field, data):
 yt.add_field(("gas", "CII_H2_ortho"), function=_CII_H2_ortho, units="erg/cm**3/s",sampling_type="local")
 
 
-def _LCII_e(field, data):
-    """                                                                                                               
-    CII Point Luminosity of electrons
-    """
-    return data['CII_e_cooling']*(data['H_p1_number_density'].to('1/cm**3')+data['He_p1_number_density'].to('1/cm**3')+2*data['He_p2_number_density'].to('1/cm**3')) *data['cell_volume'].to('cm**3')
+# def _LCII_e(field, data):
+#     """                                                                                                               
+#     CII Point Luminosity of electrons
+#     """
+#     return data['CII_e_cooling']*(data['H_p1_number_density'].to('1/cm**3')+data['He_p1_number_density'].to('1/cm**3')+2*data['He_p2_number_density'].to('1/cm**3')) *data['cell_volume'].to('cm**3')
 
-yt.add_field(("gas", "LCII_e"), function=_LCII_e, units="erg/cm**3/s",sampling_type="local")
+# yt.add_field(("gas", "LCII_e"), function=_LCII_e, units="erg/cm**3/s",sampling_type="local")
 
-def _LCII_a(field, data):
-    """                                                                                                               
-    CII Point Luminosity of electrons
-    """
-    return data['CII_a_cooling']*(data['H_number_density'].to('1/cm**3'))*data['cell_volume'].to('cm**3')
+# def _LCII_a(field, data):
+#     """                                                                                                               
+#     CII Point Luminosity of electrons
+#     """
+#     return data['CII_a_cooling']*(data['H_number_density'].to('1/cm**3'))*data['cell_volume'].to('cm**3')
     
-yt.add_field(("gas", "LCII_a"), function=_LCII_a, units="erg/cm**3/s",sampling_type="local")
+# yt.add_field(("gas", "LCII_a"), function=_LCII_a, units="erg/cm**3/s",sampling_type="local")
 
-def _LCII_HeI(field, data):
-    """                                                                                                               
-    CII Point Luminosity of electrons
-    """
-    return data['CII_HeI_cooling']*(data['He_number_density'].to('1/cm**3'))*data['cell_volume'].to('cm**3')
+# def _LCII_HeI(field, data):
+#     """                                                                                                               
+#     CII Point Luminosity of electrons
+#     """
+#     return data['CII_HeI_cooling']*(data['He_number_density'].to('1/cm**3'))*data['cell_volume'].to('cm**3')
     
-yt.add_field(("gas", "LCII_HeI"), function=_LCII_HeI, units="erg/cm**3/s",sampling_type="local")
+# yt.add_field(("gas", "LCII_HeI"), function=_LCII_HeI, units="erg/cm**3/s",sampling_type="local")
 
-def _LCII_CMB(field, data):
-    """                                                                                                               
-    CII Point Luminosity of CMB
-    """
-    return data['CII_CMB_emission']*(413.0 /(centimeter**3))*data['cell_volume'].to('cm**3')
+# def _LCII_CMB(field, data):
+#     """                                                                                                               
+#     CII Point Luminosity of CMB
+#     """
+#     return data['CII_CMB_emission']*(413.0 /(centimeter**3))*data['cell_volume'].to('cm**3')
     
-yt.add_field(("gas", "LCII_CMB"), function=_LCII_CMB, units="erg/cm**3/s",sampling_type="local")
+# yt.add_field(("gas", "LCII_CMB"), function=_LCII_CMB, units="erg/cm**3/s",sampling_type="local")
 
 
 

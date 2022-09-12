@@ -37,9 +37,11 @@ ds = yt.load("~/Data/rei20c1_a0.1667/rei20c1_a0.1667.art")
 ds.add_particle_filter("young_stars")
 
 col_list = ['CII_e_cooling','CII_a_cooling','CII_HeI_cooling','CII_CMB_emission','CII_H2_ortho','CII_H2_para','LCII_total','sphere_vol','SFR']
-
+multiplier = 30991
+mult_range = (0,1)
+which_file = 'LCII_'+str(multiplier*mult_range[0])+'_'+str(multiplier*mult_range[1])+'.txt'
 #try:
-halo_table = Table.read('/home/rnoorali/Data/rnoorali_turbo/LCII_total_all_halos.txt',format = "ascii.commented_header")
+halo_table = Table.read('/home/rnoorali/Data/rnoorali_turbo/' + which_file,format = "ascii.commented_header")
 #print(halo_table.colnames)
 #except FileNotFoundError:
 #    print('Error!')
@@ -48,16 +50,11 @@ halo_table = Table.read('/home/rnoorali/Data/rnoorali_turbo/LCII_total_all_halos
 #     halo_table[table_col] = -0.0123
 
 for row in halo_table['ID']:
-#     if row<=44810:
-#         continue
+
     if halo_table['LCII_total'][row]>0:
         print('Row',row,'is already filled')
         continue
-#     print(row)
-#     elif row == 32400:
-#         continue
 
-#     print(str(row))
 #    print("Now analyzing row " +str(row))
     sphere = make_sphere_region(halo_table[row])
     data = sphere['data_object']
@@ -74,13 +71,13 @@ for row in halo_table['ID']:
 #     print(str(row))
     
     if row%100 ==0:
-        halo_table.write('/home/rnoorali/Data/rnoorali_turbo/LCII_total_all_halos.txt',format='ascii.commented_header',overwrite=True)
+        halo_table.write('/home/rnoorali/Data/rnoorali_turbo/' + which_file,format = "ascii.commented_header",overwrite=True)
         del sphere,data#,radius
         print('Row '+ str(row)+' Writing and clearing Cache')
 #     if row>=75:
 #         print('Test Completed')
 #         break
-halo_table.write('/home/rnoorali/Data/rnoorali_turbo/LCII_total_all_halos.txt',format='ascii.commented_header',overwrite=True)
+halo_table.write('/home/rnoorali/Data/rnoorali_turbo/' + which_file,format = "ascii.commented_header",overwrite=True)
 
 
 
